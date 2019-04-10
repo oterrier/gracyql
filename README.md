@@ -4,8 +4,11 @@ An example of a basic [Starlette](https://github.com/encode/starlette) app using
 The goal is to be able to use the amazing power of spacy easily from other languages and retrieving only the information you need thanks to the GraphQL query definition.
 The GraphQL schema tries to mimic as much as possible the original Spacy API with classes Doc, Span and Token
 
+## Doc
 ![Doc](images/doc.png?raw=true "GraphiQL result")
+## Span
 ![Span](images/span.png?raw=true "GraphiQL result")
+## Token
 ![Token](images/token.png?raw=true "GraphiQL result")
 
 **Requirements**: Python 3.6+
