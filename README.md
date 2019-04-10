@@ -56,7 +56,8 @@ python -m app.main
 
 ## GraphQL queries
 
-Navigate to `http://localhost:8990/` in your browser to access the GraphiQL console to start making queries.
+Navigate to [http://localhost:8990](http://localhost:8990) in your browser to access the GraphiQL console to start making queries.
+Or [http://localhost:8990/schema](http://localhost:8990/schema) to introspect the GraphQL schema
 
 Simple POS TaggerQuery:
 
