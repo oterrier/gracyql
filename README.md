@@ -1,5 +1,5 @@
 # gracyql
-A thin graphql wrapper around spacy
+A thin GraphQL wrapper around spacy
 
 
 ## Requirements
