@@ -64,7 +64,7 @@ fragment PosTagger on Token {
   lemma
 }
 
-query PosTaggerQuery {
+query PosTaggerWihtSentencesQuery {
   nlp(model: "en") {
     doc(text: "How are you Bob? What time is it in London?") {
       text
@@ -81,10 +81,12 @@ query PosTaggerQuery {
 }
 
 ```
+![PosTaggerWihtSentencesQuery](images/postaggersents.png?raw=true "GraphiQL result")
+
 Simple Dependency  Parser Query
 
 ```
-query Parser {
+query ParserQuery {
   nlp(model: "en") {
     doc(text: "How are you Bob? What time is it in London?") {
       text
@@ -105,10 +107,12 @@ query Parser {
 }
 
 ```
+![ParserQuery](images/parser.png?raw=true "GraphiQL result")
+
 Simple NER Query
 
 ```
-query NER {
+query NERQuery {
   nlp(model: "en") {
     doc(text: "How are you Bob? What time is it in London?") {
       text
@@ -123,3 +127,4 @@ query NER {
 }
 
 ```
+![NERQuery](images/ner.png?raw=true "GraphiQL result")
