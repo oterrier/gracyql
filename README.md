@@ -24,11 +24,9 @@ The goal is to be able to use the amazing power of spacy easily from other langu
 python -m app.main
 ```
 
-## GraphQL queries & mutations
+## GraphQL queries
 
 Navigate to `http://localhost:8990/` in your browser to access the GraphiQL console to start making queries.
-
-### Create a user
 
 Simple POS TaggerQuery:
 
@@ -72,9 +70,52 @@ query PosTaggerQuery {
       sents {
         start
         end
+        text
         tokens {
           ...PosTagger
         }
+      }
+    }
+  }
+}
+
+```
+Simple Dependency  Parser Query
+
+```
+query Parser {
+  nlp(model: "en") {
+    doc(text: "How are you Bob? What time is it in London?") {
+      text
+      tokens {
+        id
+        start
+        end
+        pos
+        lemma
+        dep
+        children {
+          id
+          dep
+        }
+      }
+    }
+  }
+}
+
+```
+Simple NER Query
+
+```
+query NER {
+  nlp(model: "en") {
+    doc(text: "How are you Bob? What time is it in London?") {
+      text
+      ents {
+        start
+        end
+        label
+        text
       }
     }
   }
