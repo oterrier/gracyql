@@ -37,12 +37,22 @@ The GraphQL schema tries to mimic as much as possible the original Spacy API wit
 python -m spacy download en
 ```
 
+## Tests
+
+- From the virtualenv
+```
+pytest
+```
+
 ## Running
 
 - From the virtualenv
 ```
 python -m app.main
 ```
+
+## Clients
+- Kotlin : see [gracyql-kotlin](https://github.com/oterrier/gracyql-kotlin) 
 
 ## GraphQL queries
 
