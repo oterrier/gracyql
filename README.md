@@ -26,6 +26,11 @@ The GraphQL schema tries to mimic as much as possible the original Spacy API wit
 ```
 . venv/bin/activate
 ```
+- From the virtualenv, download your favorite spacy models
+
+```
+python -m spacy download en
+```
 
 ## Running
 
