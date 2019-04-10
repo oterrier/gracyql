@@ -3,6 +3,7 @@ import asyncio
 import graphene
 import rx
 import spacy
+from graphene.types.resolver import dict_resolver
 
 
 def spacy_attr_resolver(attname, default_value, root, info, **args):
@@ -16,9 +17,8 @@ class SpacyModels:
     def __init__(self):
         self.models = {}
 
-    def get_model(self, model: str, disable: list = []):
-        disable.sort()
-        return self.models.setdefault((model, tuple(disable)), spacy.load(model, disable=disable))
+    def get_model(self, model):
+        return self.models.setdefault(model, spacy.load(model))
 
 
 spacy_models = SpacyModels()
@@ -212,20 +212,39 @@ class Doc(graphene.ObjectType):
         return list(self.cats.items())
 
 
+class ModelMeta(graphene.ObjectType):
+    class Meta:
+        default_resolver = dict_resolver
+
+    author = graphene.String()
+    def resolve_author(self, info, text):
+        return self['nlp'].meta
+    description = graphene.String()
+    lang = graphene.String()
+    license = graphene.String()
+    name = graphene.String()
+    pipeline = graphene.List(graphene.String)
+    sources = graphene.List(graphene.String)
+    spacy_version = graphene.String()
+    version = graphene.String()
+
+
 class Nlp(graphene.ObjectType):
     """A text-processing pipeline"""
-    model = graphene.String(required=True, default_value='en')
+    meta = graphene.Field(ModelMeta)
+    def resolve_meta(self, info):
+        return self['nlp'].meta
 
     doc = graphene.Field(Doc, text=graphene.String(required=True))
 
     def resolve_doc(self, info, text):
-        return self(text)
+        return self['nlp'](text, disable=self['disable'])
 
     docs = graphene.List(Doc, texts=graphene.List(graphene.String, required=True),
                          batch_size=graphene.Int(default_value=50))
 
     def resolve_docs(self, info, texts, batch_size):
-        return self.pipe(texts, batch_size=batch_size)
+        return  self['nlp'].pipe(texts, batch_size=batch_size, disable=self['disable'])
 
 
 class Query(graphene.ObjectType):
@@ -234,7 +253,7 @@ class Query(graphene.ObjectType):
                          disable=graphene.List(graphene.String, required=False, default_value=[]))
 
     def resolve_nlp(self, info, model, disable):
-        return spacy_models.get_model(model, disable)
+        return { 'nlp' : spacy_models.get_model(model), 'disable' : disable }
 
 
 schema = graphene.Schema(query=Query, auto_camelcase=False)

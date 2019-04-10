@@ -20,7 +20,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 @app.on_event('startup')
-async def startup():
+def startup():
     print('Ready to go')
 
 

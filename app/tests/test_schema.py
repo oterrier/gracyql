@@ -142,3 +142,59 @@ def test_parse():
     assert roots[1].pos == "VERB"
     assert roots[1].lemma == "be"
 
+def test_multi_docs():
+    client = Client(schema)
+    texts = ["This is a test"]*10
+    executed = client.execute(
+        """fragment PosTagger on Token {
+              id
+              start
+              end
+              pos
+              lemma
+            }
+            query Parser {
+              nlp(model: "en") {
+                docs(texts: %s) {
+                  text
+                  tokens {
+                     ...PosTagger
+                     dep
+                     children {
+                         id
+                         dep
+                     }
+                  }
+                }
+              }
+            }"""%json.dumps(texts))
+    nlp = munchify(executed["data"]).nlp
+    docs = nlp.docs
+    assert len(docs) == 10
+
+def test_disable():
+    client = Client(schema)
+    text = "This is a test"
+    executed = client.execute(
+        """query ParserDisabledQuery {
+              nlp(model: "en", disable : ["parser", "ner"]) {
+                doc(text: "I live in Grenoble, France") {
+                  text
+                  tokens {
+                     id
+                     pos
+                     lemma
+                     dep
+                  }
+                  ents {
+                      start
+                      end
+                      label
+                }
+              }
+            }
+        }""")
+    nlp = munchify(executed["data"]).nlp
+    doc = nlp.doc
+    assert doc.tokens[0].dep == ""
+    assert len(doc.ents) == 0

@@ -1,4 +1,6 @@
 starlette
+plac
+uvicorn
 graphene
 spacy>=2.1.0
 munch>=2.3.2
