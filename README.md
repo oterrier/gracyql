@@ -150,7 +150,6 @@ query NERQuery {
 ![NERQuery](images/ner.png?raw=true "GraphiQL result")
 
 Multi documents Query
-
 ```
 fragment PosTagger on Token {
   id
@@ -173,8 +172,27 @@ query MultidocsQuery {
 
 
 ```
-![MultideryocsQu](images/multidocs.png?raw=true "GraphiQL result")
+![MultideryocsQuery](images/multidocs.png?raw=true "GraphiQL result")
 
+Model metadata Query
+```
+query ModelMetaQuery {
+  nlp(model: "en") {
+    meta {
+      author
+      description
+      lang
+      license
+      name
+      pipeline
+      sources
+      spacy_version
+      version
+    }
+  }
+}
+```
+![ModelMetaQuery](images/meta.png?raw=true "GraphiQL result")
 
 
 Query with some pipes disabled
