@@ -3,7 +3,7 @@ A thin graphql wrapper around spacy
 
 
 ## Requirements
-**: Python 3.6+
+Python 3.6+
 
 ## Description
 An example of a basic [Starlette](https://github.com/encode/starlette) app using [Spacy](https://github.com/explosion/spaCy) and [Graphene](https://github.com/graphql-python/graphene).
@@ -12,11 +12,11 @@ The main goal is to be able to use the amazing power of spacy from other languag
 
 The GraphQL schema tries to mimic as much as possible the original Spacy API with classes Doc, Span and Token
 
-## Doc
+### Doc
 ![Doc](images/doc.png?raw=true "GraphiQL result")
-## Span
+### Span
 ![Span](images/span.png?raw=true "GraphiQL result")
-## Token
+### Token
 ![Token](images/token.png?raw=true "GraphiQL result")
 
 
