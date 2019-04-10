@@ -1,7 +1,9 @@
 # gracyql
 A thin graphql wrapper around spacy
 An example of a basic [Starlette](https://github.com/encode/starlette) app using [Spacy](https://github.com/explosion/spaCy) and [Graphene](https://github.com/graphql-python/graphene).
-The goal is to be able to use the amazing power of spacy easily from other languages and retrieving only the information you need thanks to the GraphQL query definition.
+
+The main goal is to be able to use the amazing power of spacy from other languages and retrieving only the information you need thanks to the GraphQL query definition.
+
 The GraphQL schema tries to mimic as much as possible the original Spacy API with classes Doc, Span and Token
 
 ## Doc
@@ -136,3 +138,30 @@ query NERQuery {
 
 ```
 ![NERQuery](images/ner.png?raw=true "GraphiQL result")
+
+Multi documents Query
+
+```
+fragment PosTagger on Token {
+  id
+  start
+  end
+  pos
+  lemma
+}
+
+query MultidocsQuery {
+  nlp(model: "en") {
+    docs(texts: ["Hello world1!", "Hello world2 !", "Hello world3!"], batch_size : 10) {
+      text
+      tokens {
+        ...PosTagger
+      }
+    }
+  }
+}
+
+
+```
+![MultideryocsQu](images/multidocs.png?raw=true "GraphiQL result")
+
