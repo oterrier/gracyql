@@ -1,3 +1,5 @@
+import json
+
 from graphene.test import Client
 from munch import munchify
 
@@ -9,14 +11,16 @@ def test_ping():
     executed = client.execute(
         '''{
               nlp(model: "en") {
-                model
+                meta {
+                    lang
+                }
                 doc(text: "Hello world!") {
                   text
                 }
               }
             }''')
     nlp = munchify(executed["data"]).nlp
-    assert nlp.model == "en"
+    assert nlp.meta.lang == "en"
     doc = nlp.doc
     assert doc.text == "Hello world!"
 

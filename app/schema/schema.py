@@ -217,8 +217,6 @@ class ModelMeta(graphene.ObjectType):
         default_resolver = dict_resolver
 
     author = graphene.String()
-    def resolve_author(self, info, text):
-        return self['nlp'].meta
     description = graphene.String()
     lang = graphene.String()
     license = graphene.String()
