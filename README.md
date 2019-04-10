@@ -170,3 +170,26 @@ query MultidocsQuery {
 ```
 ![MultideryocsQu](images/multidocs.png?raw=true "GraphiQL result")
 
+
+
+Query with some pipes disabled
+```
+query ParserDisabledQuery {
+  nlp(model: "en", disable: ["parser", "ner"]) {
+    doc(text: "I live in Grenoble, France") {
+      text
+      tokens {
+        id
+        pos
+        lemma
+        dep
+      }
+      ents {
+        start
+        end
+        label
+      }
+    }
+  }
+}
+```
