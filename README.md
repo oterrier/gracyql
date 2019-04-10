@@ -51,6 +51,7 @@ query PosTaggerQuery {
 }
 
 ```
+![PosTaggerQuery](images/postagger.png?raw=true "GraphiQL result")
 
 Simple POS TaggerQuery including sentence level:
 
