@@ -193,4 +193,4 @@ query ParserDisabledQuery {
   }
 }
 ```
-![ParserDisabledQuery](images/disable.png?raw=true "GraphiQL result")
+![ParserDisabledQuery](images/disabled.png?raw=true "GraphiQL result")
