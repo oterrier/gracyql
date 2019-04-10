@@ -1,5 +1,6 @@
 # gracyql
 A thin graphql wrapper around spacy
+
 An example of a basic [Starlette](https://github.com/encode/starlette) app using [Spacy](https://github.com/explosion/spaCy) and [Graphene](https://github.com/graphql-python/graphene).
 
 The main goal is to be able to use the amazing power of spacy from other languages and retrieving only the information you need thanks to the GraphQL query definition.
