@@ -19,6 +19,7 @@ The GraphQL schema tries to mimic as much as possible the original Spacy API wit
 ### Token
 ![Token](images/token.png?raw=true "GraphiQL result")
 
+A simple batch processing with pagination of results is also implemented
 
 ## Setup
 
@@ -160,52 +161,6 @@ query NERQuery {
 ```
 ![NERQuery](images/ner.png?raw=true "GraphiQL result")
 
-Multi documents Query
-```
-fragment PosTagger on Token {
-  id
-  start
-  end
-  pos
-  lemma
-}
-
-query MultidocsQuery {
-  nlp(model: "en") {
-    docs(texts: ["Hello world1!", "Hello world2 !", "Hello world3!"], batch_size : 10) {
-      text
-      tokens {
-        ...PosTagger
-      }
-    }
-  }
-}
-
-
-```
-![MultideryocsQuery](images/multidocs.png?raw=true "GraphiQL result")
-
-Model metadata Query
-```
-query ModelMetaQuery {
-  nlp(model: "en") {
-    meta {
-      author
-      description
-      lang
-      license
-      name
-      pipeline
-      sources
-      spacy_version
-      version
-    }
-  }
-}
-```
-![ModelMetaQuery](images/meta.png?raw=true "GraphiQL result")
-
-
 Query with some pipes disabled
 ```
 query ParserDisabledQuery {
@@ -228,3 +183,96 @@ query ParserDisabledQuery {
 }
 ```
 ![ParserDisabledQuery](images/disabled.png?raw=true "GraphiQL result")
+
+
+Model metadata Query
+```
+query ModelMetaQuery {
+  nlp(model: "en") {
+    meta {
+      author
+      description
+      lang
+      license
+      name
+      pipeline
+      sources
+      spacy_version
+      version
+    }
+  }
+}
+```
+![ModelMetaQuery](images/meta.png?raw=true "GraphiQL result")
+
+Multi documents Query
+```
+query MultidocsQuery {
+  nlp(model: "en") {
+    batch(texts: [
+      "Hello world1!",
+      "Hello world2!",
+      "Hello world3!",
+      "Hello world4!",
+      "Hello world5!",
+      "Hello world6!",
+      "Hello world7!",
+      "Hello world8!",
+      "Hello world9!",
+      "Hello world10!"]) {
+      docs {
+        text
+      }
+    }
+  }
+}
+```
+
+Batch multi documents with pagination Query
+First call must have
+- the list of texts to process
+- batch_size : the size of the batch to achieve multi threading speedups with spaCy nlp.pipe
+- next : the number of documents to retrieve as result of the query (next < batch_size of course)
+```
+query BatchMultidocsQuery {
+  nlp(model: "en") {
+    batch(texts: [
+      "Hello world1!",
+      "Hello world2!",
+      "Hello world3!",
+      "Hello world4!",
+      "Hello world5!",
+      "Hello world6!",
+      "Hello world7!",
+      "Hello world8!",
+      "Hello world9!",
+      "Hello world10!"],
+    batch_size : 10, next : 2) {
+      batch_id
+      docs {
+        text
+      }
+    }
+  }
+}
+```
+The result contains a batch_id UUID that will be used in subsequent calls
+```{
+  "data": {
+    "nlp": {
+      "batch": {
+        ***"batch_id": "5654106e-62a7-4847-80e6-7ba3d0ec7b6a"***,
+        "docs": [
+          {
+            "text": "Hello world1!"
+          },
+          {
+            "text": "Hello world2!"
+          }
+        ]
+      }
+    }
+  },
+  "errors": null
+}
+```
