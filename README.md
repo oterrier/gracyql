@@ -261,7 +261,7 @@ The result contains a batch_id UUID that will be used in subsequent calls
   "data": {
     "nlp": {
       "batch": {
-        ***"batch_id": "5654106e-62a7-4847-80e6-7ba3d0ec7b6a"***,
+        "batch_id": "5654106e-62a7-4847-80e6-7ba3d0ec7b6a",
         "docs": [
           {
             "text": "Hello world1!"
@@ -276,3 +276,45 @@ The result contains a batch_id UUID that will be used in subsequent calls
   "errors": null
 }
 ```
+![BatchMultidocsQuery1](images/bacth1.png?raw=true "GraphiQL result")
+
+Subsequent calls must have
+- batch_id : the UUID referencing the previous batch
+- next : the number of documents to retrieve as result of the query
+```
+query BatchMultidocsQuery {
+  nlp(model: "en") {
+    batch(batch_id: "5654106e-62a7-4847-80e6-7ba3d0ec7b6a",
+      next : 2) {
+      batch_id
+      docs {
+        text
+      }
+    }
+  }
+}
+```
+The result contains the next 2 documents
+```
+{
+  "data": {
+    "nlp": {
+      "batch": {
+        "batch_id": "5654106e-62a7-4847-80e6-7ba3d0ec7b6a",
+        "docs": [
+          {
+            "text": "Hello world3!"
+          },
+          {
+            "text": "Hello world4!"
+          }
+        ]
+      }
+    }
+  },
+  "errors": null
+}
+```
+![BatchMultidocsQuery2](images/bacth2.png?raw=true "GraphiQL result")
+
+And you can issue the same query again and again until the batch is exhausted
