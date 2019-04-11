@@ -60,7 +60,7 @@ python -m app.main
 Navigate to [http://localhost:8990](http://localhost:8990) in your browser to access the GraphiQL console to start making queries.
 Or [http://localhost:8990/schema](http://localhost:8990/schema) to introspect the GraphQL schema
 
-Simple POS TaggerQuery:
+### Simple POS TaggerQuery:
 
 ```
 fragment PosTagger on Token {
@@ -85,7 +85,8 @@ query PosTaggerQuery {
 ```
 ![PosTaggerQuery](images/postagger.png?raw=true "GraphiQL result")
 
-Simple POS TaggerQuery including sentence level:
+
+### Simple POS TaggerQuery including sentence level:
 
 ```
 fragment PosTagger on Token {
@@ -115,7 +116,8 @@ query PosTaggerWihtSentencesQuery {
 ```
 ![PosTaggerWihtSentencesQuery](images/postaggersents.png?raw=true "GraphiQL result")
 
-Simple Dependency  Parser Query
+
+### Simple Dependency  Parser Query
 
 ```
 query ParserQuery {
@@ -141,7 +143,8 @@ query ParserQuery {
 ```
 ![ParserQuery](images/parser.png?raw=true "GraphiQL result")
 
-Simple NER Query
+
+### Simple NER Query
 
 ```
 query NERQuery {
@@ -161,7 +164,7 @@ query NERQuery {
 ```
 ![NERQuery](images/ner.png?raw=true "GraphiQL result")
 
-Query with some pipes disabled
+### Query with some pipes disabled
 ```
 query ParserDisabledQuery {
   nlp(model: "en", disable: ["parser", "ner"]) {
@@ -185,7 +188,7 @@ query ParserDisabledQuery {
 ![ParserDisabledQuery](images/disabled.png?raw=true "GraphiQL result")
 
 
-Model metadata Query
+### Model metadata Query
 ```
 query ModelMetaQuery {
   nlp(model: "en") {
@@ -205,7 +208,8 @@ query ModelMetaQuery {
 ```
 ![ModelMetaQuery](images/meta.png?raw=true "GraphiQL result")
 
-Multi documents Query
+
+### Multi documents Query
 ```
 query MultidocsQuery {
   nlp(model: "en") {
@@ -228,8 +232,9 @@ query MultidocsQuery {
 }
 ```
 
-Batch multi documents with pagination Query
-First call must have
+
+### Batch multi documents Query
+#### First call must have
 - the list of texts to process
 - batch_size : the size of the batch to achieve multi threading speedups with spaCy nlp.pipe
 - next : the number of documents to retrieve as result of the query (next < batch_size of course)
@@ -278,7 +283,7 @@ The result contains a batch_id UUID that will be used in subsequent calls
 ```
 ![BatchMultidocsQuery1](images/bacth1.png?raw=true "GraphiQL result")
 
-Subsequent calls must have
+#### Subsequent calls must have
 - batch_id : the UUID referencing the previous batch
 - next : the number of documents to retrieve as result of the query
 ```
