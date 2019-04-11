@@ -282,7 +282,7 @@ The result contains a batch_id UUID that will be used in subsequent calls
   "errors": null
 }
 ```
-![BatchMultidocsQuery1](images/bacth1.png?raw=true "GraphiQL result")
+![BatchMultidocsQuery1](images/batch1.png?raw=true "GraphiQL result")
 
 #### Subsequent calls must have
 - batch_id : the UUID referencing the previous batch
@@ -321,6 +321,6 @@ The result contains the next 2 documents
   "errors": null
 }
 ```
-![BatchMultidocsQuery2](images/bacth2.png?raw=true "GraphiQL result")
+![BatchMultidocsQuery2](images/batch2.png?raw=true "GraphiQL result")
 
 And you can issue the same query again and again until the batch is exhausted
