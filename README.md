@@ -12,6 +12,8 @@ The main goal is to be able to use the amazing power of spacy from other languag
 
 The GraphQL schema tries to mimic as much as possible the original Spacy API with classes Doc, Span and Token
 
+A simple batch processing with pagination of results is also implemented
+
 ### Doc
 ![Doc](images/doc.png?raw=true "GraphiQL result")
 ### Span
@@ -19,7 +21,6 @@ The GraphQL schema tries to mimic as much as possible the original Spacy API wit
 ### Token
 ![Token](images/token.png?raw=true "GraphiQL result")
 
-A simple batch processing with pagination of results is also implemented
 
 ## Setup
 
