@@ -159,21 +159,23 @@ def test_multi_docs():
             }
             query Parser {
               nlp(model: "en") {
-                docs(texts: %s) {
-                  text
-                  tokens {
-                     ...PosTagger
-                     dep
-                     children {
-                         id
+                batch(texts: %s) {
+                    docs {
+                      text
+                      tokens {
+                         ...PosTagger
                          dep
-                     }
-                  }
+                         children {
+                             id
+                             dep
+                         }
+                      }
+                    }
                 }
               }
             }"""%json.dumps(texts))
     nlp = munchify(executed["data"]).nlp
-    docs = nlp.docs
+    docs = nlp.batch.docs
     assert len(docs) == 10
 
 def test_disable():
