@@ -1,13 +1,10 @@
-import asyncio
 import itertools
 import uuid
 
 import graphene
-import rx
 import spacy
 from graphene.types.resolver import dict_resolver
 from graphql import GraphQLError
-
 
 def spacy_attr_resolver(attname, default_value, root, info, **args):
     if hasattr(root, attname + '_'):
@@ -276,7 +273,8 @@ class Nlp(graphene.ObjectType):
     doc = graphene.Field(Doc, text=graphene.String(required=True))
 
     def resolve_doc(self, info, text):
-        return self['nlp'](text, disable=self['disable'])
+        nlp = self['nlp']
+        return nlp(text, disable=self['disable'])
 
     batch = graphene.Field(Batch, texts=graphene.List(graphene.String, required=False, default_value=None),
                          batch_id=graphene.String(required=False, default_value=None),
@@ -285,10 +283,11 @@ class Nlp(graphene.ObjectType):
                          )
 
     def resolve_batch(self, info, **args):
+        nlp = self['nlp']
         if 'texts' in args:
             texts = args['texts']
             batch_size = args.get('batch_size', len(texts))
-            batch_ = BatchSlice(self['nlp'].pipe(texts, batch_size=batch_size, disable=self['disable']), len(texts))
+            batch_ = BatchSlice(nlp.pipe(texts, batch_size=batch_size, disable=self['disable']), len(texts))
             batch_docs.add(batch_)
         elif 'batch_id' in args:
             batch_ = batch_docs.get(args.get('batch_id'))
@@ -309,7 +308,6 @@ class Nlp(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    node = graphene.relay.Node.Field()
     nlp = graphene.Field(Nlp, model=graphene.String(required=False, default_value='en'),
                          disable=graphene.List(graphene.String, required=False, default_value=[]))
 
