@@ -3,6 +3,7 @@ import uvicorn
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.graphql import GraphQLApp
+#from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 
 from app.schema.schema import schema
@@ -17,7 +18,7 @@ APP_LOG_LEVEL = config('APP_LOG_LEVEL', cast=str, default="info")
 
 app = Starlette(debug=DEBUG)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-
+#app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
 
 @app.on_event('startup')
 def startup():
