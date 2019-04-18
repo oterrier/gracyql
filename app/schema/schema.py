@@ -47,7 +47,8 @@ class BatchDocs:
         self.batches[batch.uuid_] = batch
 
     def remove(self, batch : BatchSlice):
-        self.batches.pop(batch.uuid_)
+        if batch.uuid_ in self.batches:
+            del self.batches[batch.uuid_]
 
 spacy_models = SpacyModels()
 batch_docs = BatchDocs()
@@ -294,15 +295,17 @@ class Nlp(graphene.ObjectType):
             if batch_:
                 if not batch_.has_next():
                     batch_docs.remove(batch_)
-                    batch_ = None
             else:
                 raise GraphQLError('Invalid batch_id %s or batch is exhausted!'%args.get('batch_id'))
         else:
             raise GraphQLError('One of texts or batch_id must be provided!')
         if batch_:
+            batch_id = batch_.uuid_
             next = args.get('next', batch_.max)
             docs = batch_.next(next)
-            return { 'batch_id' : batch_.uuid_, 'docs' : docs }
+            if not batch_.has_next():
+                batch_docs.remove(batch_)
+            return { 'batch_id' : batch_id, 'docs' : docs }
         else:
             return None
 

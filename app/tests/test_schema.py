@@ -84,6 +84,7 @@ def test_tag_with_sentences():
     assert doc.sents[0].tokens[0].lemma == "how"
     assert doc.sents[0].tokens[0].pos == "ADV"
 
+
 def test_ner():
     client = Client(schema)
     executed = client.execute(
@@ -106,6 +107,7 @@ def test_ner():
     assert doc.ents[0].label == "PERSON"
     assert doc.ents[0].text == "Bob"
     assert doc.ents[1].label == "GPE"
+
 
 def test_parse():
     client = Client(schema)
@@ -140,15 +142,16 @@ def test_parse():
     assert roots[0].id == 1
     assert roots[0].pos == "VERB"
     assert roots[0].lemma == "be"
-    nsubjs = list(filter(lambda t: t.dep =="nsubj", roots[0].children))
+    nsubjs = list(filter(lambda t: t.dep == "nsubj", roots[0].children))
     assert doc.tokens[nsubjs[1].id].lemma == "Bob"
     assert roots[1].id == 7
     assert roots[1].pos == "VERB"
     assert roots[1].lemma == "be"
 
+
 def test_multi_docs():
     client = Client(schema)
-    texts = ["This is a test"]*10
+    texts = ["This is a test"] * 10
     executed = client.execute(
         """fragment PosTagger on Token {
               id
@@ -173,10 +176,87 @@ def test_multi_docs():
                     }
                 }
               }
-            }"""%json.dumps(texts))
+            }""" % json.dumps(texts))
     nlp = munchify(executed["data"]).nlp
     docs = nlp.batch.docs
     assert len(docs) == 10
+
+
+def test_batch():
+    client = Client(schema)
+    texts = ["This is a test. "] * 103
+    first_query = """fragment PosTagger on Token {
+              id
+              start
+              end
+              pos
+              lemma
+            }
+            query Parser {
+              nlp(model: "en") {
+                batch(texts: %s, batch_size : 10, next : 2 ) {
+                    batch_id
+                    docs {
+                      text
+                      tokens {
+                         ...PosTagger
+                         dep
+                         children {
+                             id
+                             dep
+                         }
+                      }
+                    }
+                }
+              }
+            }""" % json.dumps(texts)
+    executed = client.execute(first_query)
+    nlp = munchify(executed["data"]).nlp
+    docs = nlp.batch.docs
+    total = len(docs)
+    assert docs[0].text.startswith("This is a test")
+    assert len(docs) == 2
+    batch_id = nlp.batch.batch_id
+
+    sub_query = """fragment PosTagger on Token {
+              id
+              start
+              end
+              pos
+              lemma
+            }
+            query Parser {
+              nlp(model: "en") {
+                batch(batch_id : "%s", next : 10 ) {
+                    batch_id
+                    docs {
+                      text
+                      tokens {
+                         ...PosTagger
+                         dep
+                         children {
+                             id
+                             dep
+                         }
+                      }
+                    }
+                }
+              }
+            }""" % batch_id
+
+    has_more = "errors" not in executed
+    while has_more:
+        executed = client.execute(sub_query)
+        has_more = "errors" not in executed and "data" in executed
+        if has_more:
+            nlp = munchify(executed["data"]).nlp
+            has_more = nlp.batch
+            if has_more:
+                docs = nlp.batch.docs
+                total += len(docs)
+                assert docs[0].text.startswith("This is a test")
+    assert total == 103
+
 
 def test_disable():
     client = Client(schema)
