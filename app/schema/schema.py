@@ -1,6 +1,7 @@
 import itertools
 import uuid
 
+import gc
 import graphene
 import spacy
 from graphene.types.resolver import dict_resolver
@@ -24,6 +25,7 @@ class SpacyModels:
             if count % self.reload == 0:
                 del nlp
                 del self.models[model]
+                gc.collect()
                 nlp = spacy.load(model)
             self.models[model] = (nlp, count+1)
         else:
