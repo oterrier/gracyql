@@ -1,5 +1,6 @@
 import plac
 import uvicorn
+import multiprocessing
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.graphql import GraphQLApp
@@ -13,6 +14,7 @@ config = Config(".env")
 
 DEBUG = config('DEBUG', cast=bool, default=False)
 APP_PORT = config('APP_PORT', cast=int, default=8990)
+WORKERS = config('WORKERS', cast=int, default=multiprocessing.cpu_count())
 APP_HOST = config('APP_HOST', cast=str, default='0.0.0.0')
 APP_LOG_LEVEL = config('APP_LOG_LEVEL', cast=str, default="info")
 
@@ -42,12 +44,13 @@ def main(
         log_level: (
                 "Set the log level", "option", None, str,
                 ['critical', 'error', 'warning', 'info', 'debug']) = APP_LOG_LEVEL,
+        workers: ("Number of workers", "option", "w", int) = WORKERS,
         port: ("Bind to a socket with this port", "option", "p", int) = APP_PORT,
         host: (
                 "Bind socket to this host. Use 0.0.0.0 to make the application available on your local network",
                 "option", "s",
                 str) = APP_HOST):
-    uvicorn.run(app, host=host, port=port, debug=DEBUG, log_level=log_level)
+    uvicorn.run(app, host=host, port=port, debug=DEBUG, log_level=log_level, workers=workers)
 
 
 if __name__ == "__main__":
