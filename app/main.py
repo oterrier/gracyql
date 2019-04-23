@@ -17,6 +17,7 @@ APP_PORT = config('APP_PORT', cast=int, default=8990)
 WORKERS = config('WORKERS', cast=int, default=multiprocessing.cpu_count())
 APP_HOST = config('APP_HOST', cast=str, default='0.0.0.0')
 APP_LOG_LEVEL = config('APP_LOG_LEVEL', cast=str, default="info")
+RELOAD = config('RELOAD', cast=int, default=1000)
 
 app = Starlette(debug=DEBUG)
 app.add_middleware(GZipMiddleware, minimum_size=1000)

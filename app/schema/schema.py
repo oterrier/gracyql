@@ -14,11 +14,22 @@ def spacy_attr_resolver(attname, default_value, root, info, **args):
 
 
 class SpacyModels:
-    def __init__(self):
+    def __init__(self, reload):
         self.models = {}
+        self.reload = reload
 
     def get_model(self, model):
-        return self.models.setdefault(model, spacy.load(model))
+        if model in self.models:
+            nlp, count = self.models[model]
+            if count % self.reload == 0:
+                del nlp
+                del self.models[model]
+                nlp = spacy.load(model)
+            self.models[model] = (nlp, count+1)
+        else:
+            nlp = spacy.load(model)
+            self.models[model] = (nlp, 1)
+        return nlp
 
 class BatchSlice:
     def __init__(self, doc_generator, max):
@@ -50,7 +61,7 @@ class BatchDocs:
         if batch.uuid_ in self.batches:
             del self.batches[batch.uuid_]
 
-spacy_models = SpacyModels()
+spacy_models = SpacyModels(reload=1000)
 batch_docs = BatchDocs()
 
 
