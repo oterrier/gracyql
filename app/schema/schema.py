@@ -6,6 +6,7 @@ import graphene
 import spacy
 from graphene.types.resolver import dict_resolver
 from graphql import GraphQLError
+from threading import RLock
 
 def spacy_attr_resolver(attname, default_value, root, info, **args):
     if hasattr(root, attname + '_'):
@@ -18,19 +19,23 @@ class SpacyModels:
     def __init__(self, reload):
         self.models = {}
         self.reload = reload
+        self.rlock = RLock()
 
     def get_model(self, model):
-        if model in self.models:
-            nlp, count = self.models[model]
-            if count % self.reload == 0:
-                del nlp
-                del self.models[model]
-                gc.collect()
+        with self.rlock:
+            if model in self.models:
+                nlp, count = self.models[model]
+                if count % self.reload == 0:
+                    del nlp
+                    del self.models[model]
+                    gc.collect()
+                    nlp = spacy.load(model)
+                    print("Model %s loaded/reloaded"%nlp.meta['name'])
+                self.models[model] = (nlp, count+1)
+            else:
                 nlp = spacy.load(model)
-            self.models[model] = (nlp, count+1)
-        else:
-            nlp = spacy.load(model)
-            self.models[model] = (nlp, 1)
+                print("Model %s loaded/reloaded"%nlp.meta['name'])
+                self.models[model] = (nlp, 1)
         return nlp
 
 class BatchSlice:
@@ -63,7 +68,7 @@ class BatchDocs:
         if batch.uuid_ in self.batches:
             del self.batches[batch.uuid_]
 
-spacy_models = SpacyModels(reload=1000)
+spacy_models = SpacyModels(reload=100)
 batch_docs = BatchDocs()
 
 
