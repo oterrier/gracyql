@@ -169,6 +169,6 @@ def batchQuery(docsClause: str,
             """).substitute(nlpClause=nlpClause, batchClause=batchClause, docsClause=docsClause)
     return client.post('/', query, headers={"Content-Type": "application/graphql"})
 
-def test_leak():
-    for i in range(100_000):
-        test_bulk_tag()
+# def test_leak():
+#     for i in range(100_000):
+#         test_bulk_tag()
