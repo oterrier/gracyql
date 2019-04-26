@@ -1,10 +1,10 @@
+import multiprocessing
+
 import plac
 import uvicorn
-import multiprocessing
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.graphql import GraphQLApp
-#from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 
 from app.schema.schema import schema
