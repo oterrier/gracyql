@@ -1,5 +1,7 @@
 import itertools
+import json
 import uuid
+from collections import defaultdict
 
 import gc
 import graphene
@@ -8,11 +10,30 @@ from graphene.types.resolver import dict_resolver
 from graphql import GraphQLError
 from threading import RLock
 
+from app.schema.SentenceCorrector import SentenceCorrector
+
+
 def spacy_attr_resolver(attname, default_value, root, info, **args):
     if hasattr(root, attname + '_'):
         return getattr(root, attname + '_', default_value)
     else:
         return getattr(root, attname, default_value)
+
+
+def load_model(model, cfg):
+    overrides = json.loads(cfg) if cfg else {}
+    # overrides2 = defaultdict(dict)
+    # overrides2["sentence_corrector"]["rules"] = [
+    #     # Une indemnité de 100. 000 Frs
+    #     # Article 145-3 du code du commerce
+    #     [{"IS_DIGIT": True}, {"IS_SENT_START": True, "IS_PUNCT" : True}, {"IS_DIGIT": True}],
+    #     # Article L.145-3 du code du commerce
+    #     [{"TEXT": {"REGEX": ".*[0-9]$"}}, {"IS_SENT_START": True, "IS_PUNCT": True}, {"IS_DIGIT": True}]
+    # ]
+    nlp = spacy.load(model, **overrides)
+    custom = SentenceCorrector(nlp, **overrides)
+    nlp.add_pipe(custom)
+    return nlp
 
 
 class SpacyModels:
@@ -21,21 +42,22 @@ class SpacyModels:
         self.reload = reload
         self.rlock = RLock()
 
-    def get_model(self, model):
+    def get_model(self, model, cfg):
         with self.rlock:
-            if model in self.models:
-                nlp, count = self.models[model]
+            key = (model, cfg)
+            if key in self.models:
+                nlp, count = self.models[key]
                 if count % self.reload == 0:
                     del nlp
-                    del self.models[model]
+                    del self.models[key]
                     gc.collect()
-                    nlp = spacy.load(model)
+                    nlp = load_model(model, cfg)
                     print("Model %s loaded/reloaded"%nlp.meta['name'])
-                self.models[model] = (nlp, count+1)
+                self.models[key] = (nlp, count+1)
             else:
-                nlp = spacy.load(model)
+                nlp = load_model(model, cfg)
                 print("Model %s loaded/reloaded"%nlp.meta['name'])
-                self.models[model] = (nlp, 1)
+                self.models[key] = (nlp, 1)
         return nlp
 
 class BatchSlice:
@@ -330,10 +352,11 @@ class Nlp(graphene.ObjectType):
 
 class Query(graphene.ObjectType):
     nlp = graphene.Field(Nlp, model=graphene.String(required=False, default_value='en'),
-                         disable=graphene.List(graphene.String, required=False, default_value=[]))
+                         disable=graphene.List(graphene.String, required=False, default_value=[]),
+                         cfg=graphene.String(required=False, default_value='{}'))
 
-    def resolve_nlp(self, info, model, disable):
-        return { 'nlp' : spacy_models.get_model(model), 'disable' : disable }
+    def resolve_nlp(self, info, model, disable, cfg):
+        return { 'nlp' : spacy_models.get_model(model, cfg), 'disable' : disable }
 
 
 schema = graphene.Schema(query=Query, auto_camelcase=False)
