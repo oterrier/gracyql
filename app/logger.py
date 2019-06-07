@@ -49,7 +49,7 @@ def configure_logger(log_name, log_dir, log_level):
     )
 
     if log_dir:
-        handler = logging.FileHandler(Path(log_dir)/"%s.json.log"%log_name)
+        handler = logging.FileHandler(Path(log_dir)/("%s.json.log"%log_name))
     else:
         handler = logging.StreamHandler(sys.stdout)
 
