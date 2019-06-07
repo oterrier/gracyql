@@ -6,3 +6,5 @@ spacy>=2.1.0
 munch>=2.3.2
 wheel
 pytest
+structlog
+python-json-logger

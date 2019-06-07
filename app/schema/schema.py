@@ -6,12 +6,13 @@ from collections import defaultdict
 import gc
 import graphene
 import spacy
+import structlog
 from graphene.types.resolver import dict_resolver
 from graphql import GraphQLError
 from threading import RLock
 
 from app.schema.SentenceCorrector import SentenceCorrector
-
+logger = structlog.get_logger("gracyql")
 
 def spacy_attr_resolver(attname, default_value, root, info, **args):
     if hasattr(root, attname + '_'):
@@ -30,6 +31,7 @@ def load_model(model, cfg):
     #     # Article L.145-3 du code du commerce
     #     [{"TEXT": {"REGEX": ".*[0-9]$"}}, {"IS_SENT_START": True, "IS_PUNCT": True}, {"IS_DIGIT": True}]
     # ]
+    logger.info("Load model %s"%model, cfg=cfg)
     nlp = spacy.load(model, **overrides)
     custom = SentenceCorrector(nlp, **overrides)
     nlp.add_pipe(custom)

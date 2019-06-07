@@ -1,12 +1,17 @@
+import logging
 import multiprocessing
+import sys
+from pathlib import Path
 
 import plac
+import structlog
 import uvicorn
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.graphql import GraphQLApp
 from starlette.middleware.gzip import GZipMiddleware
 
+from app.logger import configure_logger
 from app.schema.schema import schema
 
 # Config will be read from environment variables and/or ".env" files.
@@ -19,7 +24,11 @@ if WORKERS == 0:
     WORKERS = multiprocessing.cpu_count()
 APP_HOST = config('APP_HOST', cast=str, default='0.0.0.0')
 APP_LOG_LEVEL = config('APP_LOG_LEVEL', cast=str, default="info")
+APP_LOG_DIR = config('APP_LOG_DIR', cast=str, default="")
 RELOAD = config('RELOAD', cast=int, default=1000)
+
+
+logger = configure_logger("gracyql", APP_LOG_DIR, uvicorn.config.LOG_LEVELS[APP_LOG_LEVEL])
 
 app = Starlette(debug=DEBUG)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -53,7 +62,7 @@ def main(
                 "Bind socket to this host. Use 0.0.0.0 to make the application available on your local network",
                 "option", "s",
                 str) = APP_HOST):
-    uvicorn.run(app, host=host, port=port, debug=DEBUG, log_level=log_level, workers=workers)
+    uvicorn.run(app, host=host, port=port, debug=DEBUG, logger=logging.getLogger("uvicorn"), log_level=log_level, workers=workers)
 
 
 if __name__ == "__main__":
