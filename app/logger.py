@@ -1,5 +1,7 @@
 import logging
 import sys
+import threading
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import structlog
@@ -13,6 +15,11 @@ class EventRenamer(object):  # with a better name hopefully
             event_dict[self._field_name] = event_dict.pop('event')
         return event_dict
 
+def add_thread_info(logger, method_name, event_dict):  # pylint: disable=unused-argument
+    thread = threading.current_thread()
+    event_dict['thread_id'] = thread.ident
+    event_dict['thread_name'] = thread.name
+    return event_dict
 
 def configure_logger(log_name, log_dir, log_level):
     eventrenamer = EventRenamer("message")
@@ -21,6 +28,7 @@ def configure_logger(log_name, log_dir, log_level):
     shared_processors = [
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
+        add_thread_info,
         timestamper,
         eventrenamer
     ]
@@ -29,13 +37,14 @@ def configure_logger(log_name, log_dir, log_level):
             structlog.stdlib.filter_by_level,
             structlog.stdlib.add_logger_name,
             structlog.stdlib.add_log_level,
+            add_thread_info,
             structlog.stdlib.PositionalArgumentsFormatter(),
             timestamper,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
             structlog.stdlib.render_to_log_kwargs,
-            eventrenamer
+            #eventrenamer
         ],
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -49,7 +58,10 @@ def configure_logger(log_name, log_dir, log_level):
     )
 
     if log_dir:
-        handler = logging.FileHandler(Path(log_dir)/("%s.json.log"%log_name))
+        log_dir = Path(log_dir)
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file = log_dir / ("%s.json.log" % log_name)
+        handler = RotatingFileHandler(log_file, maxBytes=10 * 1024 * 1024, backupCount=5)
     else:
         handler = logging.StreamHandler(sys.stdout)
 
