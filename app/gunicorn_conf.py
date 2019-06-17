@@ -3,11 +3,11 @@ import multiprocessing
 import os
 
 workers_per_core_str = os.getenv("WORKERS_PER_CORE", "1")
-web_concurrency_str = os.getenv("WEB_CONCURRENCY", None)
-host = os.getenv("HOST", "0.0.0.0")
-port = os.getenv("PORT", "8990")
+web_concurrency_str = os.getenv("WEB_CONCURRENCY", "2")
+host = os.getenv("APP_HOST", "0.0.0.0")
+port = os.getenv("APP_PORT", "8990")
 bind_env = os.getenv("BIND", None)
-use_loglevel = os.getenv("LOG_LEVEL", "info")
+use_loglevel = os.getenv("APP_LOG_LEVEL", "info")
 if bind_env:
     use_bind = bind_env
 else:
@@ -28,6 +28,8 @@ workers = web_concurrency
 bind = use_bind
 keepalive = 120
 errorlog = "-"
+timeout=1800
+#max_requests=10
 
 # For debugging and testing
 log_data = {

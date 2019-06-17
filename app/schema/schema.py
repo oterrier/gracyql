@@ -44,22 +44,24 @@ class SpacyModels:
         self.reload = reload
         self.rlock = RLock()
 
-    def get_model(self, model, cfg):
+    def get_model(self, model, cfg, num=1):
         with self.rlock:
             key = (model, cfg)
             if key in self.models:
                 nlp, count = self.models[key]
+                logger.info("About to process %d documents with model %s" % (num, nlp.meta['name']))
                 if count % self.reload == 0:
                     del nlp
                     del self.models[key]
                     gc.collect()
                     nlp = load_model(model, cfg)
-                    print("Model %s loaded/reloaded"%nlp.meta['name'])
-                self.models[key] = (nlp, count+1)
+                    logger.info("Model %s loaded/reloaded"%nlp.meta['name'])
+                self.models[key] = (nlp, count+num)
             else:
                 nlp = load_model(model, cfg)
-                print("Model %s loaded/reloaded"%nlp.meta['name'])
-                self.models[key] = (nlp, 1)
+                logger.info("About to process %d documents with model %s" % (num, nlp.meta['name']))
+                logger.info("Model %s loaded/reloaded"%nlp.meta['name'])
+                self.models[key] = (nlp, num)
         return nlp
 
 class BatchSlice:
@@ -92,7 +94,7 @@ class BatchDocs:
         if batch.uuid_ in self.batches:
             del self.batches[batch.uuid_]
 
-spacy_models = SpacyModels(reload=100)
+spacy_models = SpacyModels(reload=1000)
 batch_docs = BatchDocs()
 
 
@@ -311,12 +313,13 @@ class Nlp(graphene.ObjectType):
     """A text-processing pipeline"""
     meta = graphene.Field(ModelMeta)
     def resolve_meta(self, info):
-        return self['nlp'].meta
+        nlp = spacy_models.get_model(self['model'], self['cfg'], 0)
+        return nlp.meta
 
     doc = graphene.Field(Doc, text=graphene.String(required=True))
 
     def resolve_doc(self, info, text):
-        nlp = self['nlp']
+        nlp = spacy_models.get_model(self['model'], self['cfg'])
         return nlp(text, disable=self['disable'])
 
     batch = graphene.Field(Batch, texts=graphene.List(graphene.String, required=False, default_value=None),
@@ -326,10 +329,10 @@ class Nlp(graphene.ObjectType):
                          )
 
     def resolve_batch(self, info, **args):
-        nlp = self['nlp']
         if 'texts' in args:
             texts = args['texts']
             batch_size = args.get('batch_size', len(texts))
+            nlp = spacy_models.get_model(self['model'], self['cfg'], len(texts))
             batch_ = BatchSlice(nlp.pipe(texts, batch_size=batch_size, disable=self['disable']), len(texts))
             batch_docs.add(batch_)
         elif 'batch_id' in args:
@@ -358,7 +361,7 @@ class Query(graphene.ObjectType):
                          cfg=graphene.String(required=False, default_value='{}'))
 
     def resolve_nlp(self, info, model, disable, cfg):
-        return { 'nlp' : spacy_models.get_model(model, cfg), 'disable' : disable }
+        return { 'model' : model, 'cfg' : cfg, 'disable' : disable }
 
 
 schema = graphene.Schema(query=Query, auto_camelcase=False)
