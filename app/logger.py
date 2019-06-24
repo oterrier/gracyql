@@ -25,7 +25,7 @@ def add_thread_info(logger, method_name, event_dict):  # pylint: disable=unused-
 
 def configure_logger(log_name, log_dir, log_level):
     eventrenamer = EventRenamer("message")
-    timestamper = structlog.processors.TimeStamper(fmt="iso")
+    timestamper = structlog.processors.TimeStamper(fmt="iso", utc=False, key="@timestamp")
 
     shared_processors = [
         structlog.stdlib.add_logger_name,
