@@ -1,4 +1,5 @@
 import logging
+import socket
 import sys
 import threading
 from logging.handlers import RotatingFileHandler
@@ -19,6 +20,7 @@ def add_thread_info(logger, method_name, event_dict):  # pylint: disable=unused-
     thread = threading.current_thread()
     event_dict['thread_id'] = thread.ident
     event_dict['thread_name'] = thread.name
+    event_dict['source_host'] = socket.gethostname()
     return event_dict
 
 def configure_logger(log_name, log_dir, log_level):

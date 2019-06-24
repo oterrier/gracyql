@@ -14,6 +14,9 @@ from threading import RLock
 from app.schema.SentenceCorrector import SentenceCorrector
 logger = structlog.get_logger("gracyql")
 
+# from pympler import tracker
+# tr = tracker.SummaryTracker()
+
 def spacy_attr_resolver(attname, default_value, root, info, **args):
     if hasattr(root, attname + '_'):
         return getattr(root, attname + '_', default_value)
@@ -62,6 +65,7 @@ class SpacyModels:
                 logger.info("About to process %d documents with model %s" % (num, nlp.meta['name']))
                 logger.info("Model %s loaded/reloaded"%nlp.meta['name'])
                 self.models[key] = (nlp, num)
+        #tr.print_diff()
         return nlp
 
 class BatchSlice:
@@ -333,7 +337,7 @@ class Nlp(graphene.ObjectType):
             texts = args['texts']
             batch_size = args.get('batch_size', len(texts))
             nlp = spacy_models.get_model(self['model'], self['cfg'], len(texts))
-            batch_ = BatchSlice(nlp.pipe(texts, batch_size=batch_size, disable=self['disable']), len(texts))
+            batch_ = BatchSlice(nlp.pipe(texts, batch_size=batch_size, disable=self['disable'], cleanup=True), len(texts))
             batch_docs.add(batch_)
         elif 'batch_id' in args:
             batch_ = batch_docs.get(args.get('batch_id'))

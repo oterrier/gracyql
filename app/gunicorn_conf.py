@@ -29,7 +29,7 @@ bind = use_bind
 keepalive = 120
 errorlog = "-"
 timeout=1800
-#max_requests=10
+max_requests=100
 
 # For debugging and testing
 log_data = {
