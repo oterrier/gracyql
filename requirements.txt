@@ -2,9 +2,11 @@ starlette
 plac
 uvicorn
 graphene
-spacy>=2.1.0
+spacy==2.1.4
 munch>=2.3.2
 wheel
 pytest
 structlog
 python-json-logger
+#PyICU
+#nltk

@@ -25,18 +25,18 @@ class ReloadableNlp:
         self.nlp = spacy.load(model)
 
     def get_nlp(self):
-        self.count += 1
-        if self.count % 1_000 == 0:
-            del self.nlp
-            gc.collect()
-            self.nlp = spacy.load(self.model)
+        # self.count += 1
+        # if self.count % self.reload == 0:
+        #     del self.nlp
+        #     gc.collect()
+        #     self.nlp = spacy.load(self.model)
         return self.nlp
 
 
 
 def parse_texts(reloadable, texts, iterations=10_000):
     for i in range(iterations):
-        for doc in reloadable.get_nlp().pipe(texts):
+        for doc in reloadable.get_nlp().pipe(texts, disable=['ner', 'parser']):
             yield doc
 
 @plac.annotations(

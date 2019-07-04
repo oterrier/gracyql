@@ -11,7 +11,10 @@ from graphene.types.resolver import dict_resolver
 from graphql import GraphQLError
 from threading import RLock
 
-from app.schema.SentenceCorrector import SentenceCorrector
+# from app.schema.ICUSentencizer import ICUSentencizer
+# from app.schema.PunktSentencizer import PunktSentencizer
+# from app.schema.SentenceCorrector import SentenceCorrector
+from app.schema.RuleSentencizer import RuleSentencizer
 logger = structlog.get_logger("gracyql")
 
 # from pympler import tracker
@@ -27,17 +30,23 @@ def spacy_attr_resolver(attname, default_value, root, info, **args):
 def load_model(model, cfg):
     overrides = json.loads(cfg) if cfg else {}
     # overrides2 = defaultdict(dict)
-    # overrides2["sentence_corrector"]["rules"] = [
+    # overrides2["rule_sentencizer"]["split"] = [
+    #     # Split on double line breaks
+    #     [{"IS_SPACE": True, "TEXT": { "REGEX" : "[\n]{2,}" }}, {}],
+    #     # Split on hard punctuation
+    #     [{"IS_PUNCT": True, "TEXT" : { "IN" : [".", "!", "?", ";"]}}, {}]
+    # ]
+    # overrides2["rule_sentencizer"]["join"] = [
     #     # Une indemnité de 100. 000 Frs
-    #     # Article 145-3 du code du commerce
-    #     [{"IS_DIGIT": True}, {"IS_SENT_START": True, "IS_PUNCT" : True}, {"IS_DIGIT": True}],
-    #     # Article L.145-3 du code du commerce
-    #     [{"TEXT": {"REGEX": ".*[0-9]$"}}, {"IS_SENT_START": True, "IS_PUNCT": True}, {"IS_DIGIT": True}]
+    #     [{"IS_DIGIT": True}, {"IS_PUNCT" : True}, {"IS_SENT_START": True, "IS_DIGIT": True}]
     # ]
     logger.info("Load model %s"%model, cfg=cfg)
     nlp = spacy.load(model, **overrides)
-    custom = SentenceCorrector(nlp, **overrides)
-    nlp.add_pipe(custom)
+    #sentencizer = PunktSentencizer(nlp, **overrides)
+    sentencizer = RuleSentencizer(nlp, **overrides)
+    #sentencizer = ICUSentencizer(nlp, **overrides)
+    #nlp.add_pipe(sentencizer, first=True)
+    nlp.add_pipe(sentencizer)
     return nlp
 
 
