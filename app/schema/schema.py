@@ -17,8 +17,8 @@ from threading import RLock
 from app.schema.RuleSentencizer import RuleSentencizer
 logger = structlog.get_logger("gracyql")
 
-# from pympler import tracker
-# tr = tracker.SummaryTracker()
+#from pympler import tracker, summary, muppy
+#tr = tracker.SummaryTracker()
 
 def spacy_attr_resolver(attname, default_value, root, info, **args):
     if hasattr(root, attname + '_'):
@@ -74,7 +74,6 @@ class SpacyModels:
                 logger.info("About to process %d documents with model %s" % (num, nlp.meta['name']))
                 logger.info("Model %s loaded/reloaded"%nlp.meta['name'])
                 self.models[key] = (nlp, num)
-        #tr.print_diff()
         return nlp
 
 class BatchSlice:
@@ -86,7 +85,7 @@ class BatchSlice:
 
     def next(self, next):
         self.id += next
-        return list(itertools.islice(self.gen, 0, next))
+        return itertools.islice(self.gen, 0, next)
 
     def has_next(self):
         return self.id < self.max

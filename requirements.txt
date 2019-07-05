@@ -2,6 +2,7 @@ starlette
 plac
 uvicorn
 graphene
+#numpy==1.16.4
 spacy==2.1.4
 munch>=2.3.2
 wheel
