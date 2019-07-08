@@ -60,6 +60,6 @@ class RuleSentencizer(object):
                 for token in doc[start:end]:
                     if token.is_sent_start:
                         token.is_sent_start = False
-        doc.is_parsed = save_parsed
+        doc.is_parsed = save_parsed if doc.is_sentenced else True
         return doc
 
