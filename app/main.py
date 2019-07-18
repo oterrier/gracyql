@@ -10,6 +10,7 @@ from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.graphql import GraphQLApp
 from starlette.middleware.gzip import GZipMiddleware
+from starlette_prometheus import metrics, PrometheusMiddleware
 
 from app.logger import configure_logger
 from app.schema.schema import schema
@@ -32,6 +33,8 @@ logger = configure_logger("gracyql", APP_LOG_DIR, uvicorn.config.LOG_LEVELS[APP_
 
 app = Starlette(debug=DEBUG)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(PrometheusMiddleware)
+
 #app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
 
 @app.on_event('startup')
@@ -51,6 +54,7 @@ app.add_route("/", GraphQLApp(schema))
 def read_schema():
     return schema.introspect()
 
+app.add_route("/metrics/", metrics)
 
 def main(
         log_level: (

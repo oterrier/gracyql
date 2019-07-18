@@ -1,7 +1,6 @@
 import itertools
 import json
 import uuid
-from collections import defaultdict
 
 import gc
 import graphene
@@ -14,7 +13,8 @@ from threading import RLock
 # from app.schema.ICUSentencizer import ICUSentencizer
 # from app.schema.PunktSentencizer import PunktSentencizer
 # from app.schema.SentenceCorrector import SentenceCorrector
-from app.schema.RuleSentencizer import RuleSentencizer
+#from app.pipeline.PunktSentencizer import PunktSentencizer
+from app.pipeline.RuleSentencizer import RuleSentencizer
 logger = structlog.get_logger("gracyql")
 
 #from pympler import tracker, summary, muppy
