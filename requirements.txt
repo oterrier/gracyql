@@ -4,7 +4,7 @@ plac
 uvicorn
 graphene
 #numpy==1.16.4
-spacy==2.1.6
+spacy==2.1.8
 munch>=2.3.2
 wheel
 pytest
