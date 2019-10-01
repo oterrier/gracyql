@@ -30,12 +30,19 @@ def add_local_timestamp(logger, method_name, event_dict):
     event_dict['@timestamp'] = now.isoformat(timespec = 'milliseconds')
     return event_dict
 
+def add_upper_log_level(logger, method_name, event_dict):
+    """
+    Add the log level to the event dict.
+    """
+    event_dict["level"] = method_name.upper()
+    return event_dict
+
 def configure_logger(log_name, log_dir, log_level):
     eventrenamer = EventRenamer("message")
 
     shared_processors = [
         structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
+        add_upper_log_level,
         add_thread_info,
         add_local_timestamp,
         eventrenamer
@@ -44,7 +51,7 @@ def configure_logger(log_name, log_dir, log_level):
         processors=[
             structlog.stdlib.filter_by_level,
             structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
+            add_upper_log_level,
             add_thread_info,
             structlog.stdlib.PositionalArgumentsFormatter(),
             add_local_timestamp,
