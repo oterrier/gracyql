@@ -1,4 +1,4 @@
-dateutil
+python-dateutil
 starlette
 starlette-prometheus
 plac
