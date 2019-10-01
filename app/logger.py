@@ -27,7 +27,7 @@ def add_thread_info(logger, method_name, event_dict):  # pylint: disable=unused-
 
 def add_local_timestamp(logger, method_name, event_dict):
     now = datetime.now(LOCAL_TZ)
-    event_dict['@timestamp'] = now.isoformat()
+    event_dict['@timestamp'] = now.isoformat(timespec = 'milliseconds')
     return event_dict
 
 def configure_logger(log_name, log_dir, log_level):
