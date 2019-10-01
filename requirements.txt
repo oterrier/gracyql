@@ -1,3 +1,4 @@
+dateutil
 starlette
 starlette-prometheus
 plac
