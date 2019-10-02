@@ -26,6 +26,7 @@ if WORKERS == 0:
 APP_HOST = config('APP_HOST', cast=str, default='0.0.0.0')
 APP_LOG_LEVEL = config('APP_LOG_LEVEL', cast=str, default="info")
 APP_LOG_DIR = config('APP_LOG_DIR', cast=str, default="")
+APP_ACCESS_LOG = config('APP_ACCESS_LOG', cast=bool, default=False)
 RELOAD = config('RELOAD', cast=int, default=1000)
 
 
@@ -60,13 +61,17 @@ def main(
         log_level: (
                 "Set the log level", "option", None, str,
                 ['critical', 'error', 'warning', 'info', 'debug']) = APP_LOG_LEVEL,
+        access_log: (
+                "Enable/disable the HTTP access log", "option", None, bool) = APP_ACCESS_LOG,
         workers: ("Number of workers", "option", "w", int) = WORKERS,
         port: ("Bind to a socket with this port", "option", "p", int) = APP_PORT,
         host: (
                 "Bind socket to this host. Use 0.0.0.0 to make the application available on your local network",
                 "option", "s",
                 str) = APP_HOST):
-    uvicorn.run(app, host=host, port=port, debug=DEBUG, logger=logging.getLogger("uvicorn"), log_level=log_level, workers=workers)
+    access_logger = logging.getLogger("uvicorn")
+    access_logger.setLevel(uvicorn.config.LOG_LEVELS[log_level])
+    uvicorn.run(app, host=host, port=port, debug=DEBUG, logger=access_logger, log_level=log_level, workers=workers, access_log=access_log)
 
 
 if __name__ == "__main__":
