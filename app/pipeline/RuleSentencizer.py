@@ -72,7 +72,7 @@ class RuleSentencizer(object):
                 first_non_space = 0
                 while first_non_space < sentlen and sent[first_non_space].is_space:
                     first_non_space += 1
-                if first_non_space > 0:
+                if first_non_space > 0 and first_non_space < sentlen:
                     sent[0].is_sent_start = False
                     sent[first_non_space].is_sent_start = True
 
