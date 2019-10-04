@@ -2,10 +2,12 @@ import logging
 import socket
 import sys
 import threading
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-
 import structlog
+from dateutil.tz import tzlocal
+LOCAL_TZ=tzlocal()
 
 class EventRenamer(object):  # with a better name hopefully
     def __init__(self, field_name):
@@ -23,25 +25,36 @@ def add_thread_info(logger, method_name, event_dict):  # pylint: disable=unused-
     event_dict['source_host'] = socket.gethostname()
     return event_dict
 
+def add_local_timestamp(logger, method_name, event_dict):
+    now = datetime.now(LOCAL_TZ)
+    event_dict['@timestamp'] = now.isoformat(timespec = 'milliseconds')
+    return event_dict
+
+def add_upper_log_level(logger, method_name, event_dict):
+    """
+    Add the log level to the event dict.
+    """
+    event_dict["level"] = method_name.upper()
+    return event_dict
+
 def configure_logger(log_name, log_dir, log_level):
     eventrenamer = EventRenamer("message")
-    timestamper = structlog.processors.TimeStamper(fmt="iso", utc=False, key="@timestamp")
 
     shared_processors = [
         structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
+        add_upper_log_level,
         add_thread_info,
-        timestamper,
+        add_local_timestamp,
         eventrenamer
     ]
     structlog.configure(
         processors=[
             structlog.stdlib.filter_by_level,
             structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
+            add_upper_log_level,
             add_thread_info,
             structlog.stdlib.PositionalArgumentsFormatter(),
-            timestamper,
+            add_local_timestamp,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
