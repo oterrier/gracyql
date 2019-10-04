@@ -1,7 +1,3 @@
-from collections import defaultdict
-
-import plac
-import spacy
 from spacy.matcher.matcher import Matcher
 from spacy.tokens.doc import Doc
 
@@ -64,17 +60,6 @@ class RuleSentencizer(object):
                 for token in doc[start:end]:
                     if token.is_sent_start:
                         token.is_sent_start = False
-        # Trim starting spaces
-        sent_start = None
-        for sent in doc.sents:
-            sentlen = len(sent)
-            first_non_space = 0
-            while first_non_space < sentlen and sent[first_non_space].is_space:
-                first_non_space += 1
-            if first_non_space > 0:
-                sent[0].is_sent_start = False
-                sent[first_non_space].is_sent_start = True
-
         doc.is_parsed = save_parsed if doc.is_sentenced else True
         return doc
 
