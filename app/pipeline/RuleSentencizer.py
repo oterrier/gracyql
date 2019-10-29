@@ -4,7 +4,7 @@ import plac
 import spacy
 from spacy.matcher.matcher import Matcher
 from spacy.tokens.doc import Doc
-
+import yaml
 
 class RuleSentencizer(object):
     """
@@ -23,7 +23,7 @@ class RuleSentencizer(object):
         # Split on double line breaks
         [{"IS_SPACE": True, "TEXT": { "REGEX" : "[\n]{2,}" }}, {}],
         # Split on hard punctuation
-        [{"ISPUNCT": True, "TEXT" : { "IN" : [".", "!", "?"]}}, {}]
+        [{"IS_PUNCT": True, "TEXT" : { "IN" : [".", "!", "?"]}}, {}]
     ]
     overrides["rule_sentencizer"]["join"] = [
         # Une indemnité de 100. 000 Frs
@@ -81,19 +81,19 @@ class RuleSentencizer(object):
 
 
 def main():
-    text = "toto\net titi"
-    #text = "L'annonce du divorce de Sarkozy \"aurait pu se faire plus tôt\": Hollande \n \nMULHOUSE, 18 oct 2007 (AFP) \n \nL'annonce du divorce de Sarkozy \"aurait pu se faire plus tôt\": Hollande \n \nL'annonce du divorce de Nicolas et Cécilia Sarkozy \"aurait pu se faire plus tôt\", a estimé jeudi le premier secrétaire du Parti socialiste pour qui \"il fallait qu'il y ait une clarification\". \n \n\"Désormais, il n'y aura plus de questions qui seront posées\", a souligné M. Hollande, lors d'une conférence de presse organisée en marge d'une visite à la fédération du PS du Haut-Rhin. \n \n\"Cette annonce aurait pu se faire plus tôt. Mais je veux croire à la coïncidence\" avec le mouvement de grève de jeudi dans le pays, a-t-il dit. \n \n\"Aujourd'hui, l'information principale n'est pas le divorce de M. et Mme Sarkozy, c'est la grève particulièrement suivie qui a donné l'espoir qu'après ce mouvement il puisse y avoir une vraie négociation\".\nM. Hollande a aussi estimé que \"M. Sarkozy est un homme comme les autres\". \"Il a fait un choix personnel et sa vie privée mérite protection\", a-t-il dit."
-    overrides = defaultdict(dict)
-    overrides["rule_sentencizer"]["split"] = [
-        # Split on double line breaks
-        [{"IS_SPACE": True, "TEXT": { "REGEX" : "([\r]?[\n]){2,}" }}, {}],
-        # Split on hard punctuation
-        [{"ISPUNCT": True, "TEXT" : { "IN" : [".", "!", "?"]}}, {}],
-        # Split on full stop if not followed by lower case letter or digit
-        [{"ISPUNCT": True, "TEXT": "."}, {"SHAPE": { "REGEX" : "^[^xd]" }}]
-    ]
+    sent_config = yaml.safe_load(open("example.yaml", 'r'))
+    text = "L'annonce du divorce de MM. Sarkozy \"aurait pu se faire plus tôt\": Hollande \n \nMULHOUSE, 18 oct 2007 (AFP) \n \nL'annonce du divorce de Sarkozy \"aurait pu se faire plus tôt\": Hollande \n \nL'annonce du divorce de Nicolas et Cécilia Sarkozy \"aurait pu se faire plus tôt\", a estimé jeudi le premier secrétaire du Parti socialiste pour qui \"il fallait qu'il y ait une clarification\". \n \n\"Désormais, il n'y aura plus de questions qui seront posées\", a souligné le Pr. Hollande, lors d'une conférence de presse organisée au 3 Av. de la Grande Armée, en marge d'une visite à la fédération du PS du Haut-Rhin. \n \n\"Cette annonce aurait pu se faire plus tôt. Mais je veux croire à la coïncidence\" avec le mouvement de grève de jeudi dans le pays, a-t-il dit. \n \n\"Aujourd'hui, l'information principale n'est pas le divorce de M. et Mme Sarkozy, c'est la grève particulièrement suivie qui a donné l'espoir qu'après ce mouvement il puisse y avoir une vraie négociation\".\nM. Hollande a aussi estimé que \"M. Sarkozy est un homme comme les autres\". \"Il a fait un choix personnel et sa vie privée mérite protection\", a-t-il dit."
+    # overrides = defaultdict(dict)
+    # overrides["rule_sentencizer"]["split"] = [
+    #     # Split on double line breaks
+    #     [{"IS_SPACE": True, "TEXT": { "REGEX" : "([\r\t ]?[\n]){2,}" }}, {}],
+    #     # Split on hard punctuation
+    #     [{"IS_PUNCT": True, "TEXT" : { "IN" : ["!", "?"]}}, {}],
+    #     # Split on full stop if not followed by lower case letter or digit
+    #     [{"IS_PUNCT": True, "TEXT": "."}, {"SHAPE": { "REGEX" : "^[^xd]" }}]
+    # ]
     nlp = spacy.load("fr", disable=['ner', 'parser'])
-    custom = RuleSentencizer(nlp, **overrides)
+    custom = RuleSentencizer(nlp, **sent_config)
     nlp.add_pipe(custom)
     doc = nlp(text)
     for sent in doc.sents:

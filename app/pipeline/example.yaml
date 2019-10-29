@@ -1,0 +1,33 @@
+rule_sentencizer:
+  split:
+    - # Split on double line breaks
+      - IS_SPACE: true
+        TEXT:
+          REGEX: "([\r ]?[\n]){2,}"
+      - {}
+    - # Split on hard punctuation
+      - IS_PUNCT: true
+        TEXT:
+          IN:
+            - "!"
+            - "?"
+      - {}
+    - # Split on full stop if not followed by lower case letter or digit
+      - IS_PUNCT: true
+        TEXT: "."
+      - SHAPE:
+          REGEX: "^[^xd]"
+  join:
+    - # Don't break on common abbreviations
+      - TEXT:
+          IN:
+            - "MM"
+            - "Prof"
+            - "Pr"
+            - "Av"
+            - "Boul"
+            - "Ch"
+      - IS_PUNCT: true
+        TEXT: "."
+      - SHAPE:
+          REGEX : "[^X]"
