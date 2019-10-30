@@ -11,5 +11,6 @@ wheel
 pytest
 structlog
 python-json-logger
+PyYAML
 #PyICU
 #nltk
