@@ -26,13 +26,13 @@ pipeline {
   }
 
   post {
-        // trigger every-works
-        always {
-          echo "sending Systematic Build notification"
-          emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
-            replyTo: '${DEFAULT_REPLYTO}', subject: '${DEFAULT_SUBJECT}',
-            to: '${DEFAULT_RECIPIENTS}')
-        }
+    // trigger every-works
+    always {
+      echo "sending Systematic Build notification"
+      emailext(body: '${DEFAULT_CONTENT}', mimeType: 'text/html',
+        replyTo: '${DEFAULT_REPLYTO}', subject: '${DEFAULT_SUBJECT}',
+        to: '${DEFAULT_RECIPIENTS}')
+    }
   }
 
 }
