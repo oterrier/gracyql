@@ -16,8 +16,9 @@ pipeline {
   }
 
   stages {
-    stage('Build docker') {
+    stage('Build Gracyql docker image') {
       steps {
+        println "Building Gracyql docker image, with Tag :${env.BRANCH_NAME}"
         script {
           sh "docker build -t ${GRACYQL_DOCKER}:${env.BRANCH_NAME} ."
         }
