@@ -21,7 +21,6 @@ pipeline {
         script {
           sh "docker build -t ${GRACYQL_DOCKER}:${env.BRANCH_NAME} ."
         }
-
       }
     }
   }
