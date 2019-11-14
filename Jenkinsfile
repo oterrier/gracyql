@@ -36,8 +36,4 @@ pipeline {
         }
   }
 
-  tools {
-    docker 'DOCKER-19'
-  }
-
 }
