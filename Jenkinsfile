@@ -5,7 +5,7 @@ pipeline {
   }
 
   environment {
-    GRACYQL_DOCKER =  'kairntech/gracyql'
+    DOCKER_GRACYQL =  'kairntech/gracyql'
   }
 
   agent {
@@ -18,9 +18,9 @@ pipeline {
   stages {
     stage('Build Gracyql docker image') {
       steps {
-        println "building Gracyql docker image: ${GRACYQL_DOCKER}:${env.BRANCH_NAME}"
+        println "building Gracyql docker image: ${DOCKER_GRACYQL}:${env.BRANCH_NAME}"
         script {
-          sh "docker build -t ${GRACYQL_DOCKER}:${env.BRANCH_NAME} ."
+          sh "docker build -t ${DOCKER_GRACYQL}:${env.BRANCH_NAME} ."
         }
       }
     }
