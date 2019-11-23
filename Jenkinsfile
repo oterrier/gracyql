@@ -11,7 +11,7 @@ pipeline {
   agent {
     node {
       label 'master'
-      customWorkspace "/home/karcherg/jenkins/${env.JOB_NAME}"
+      customWorkspace "/opt/jenkins/${env.JOB_NAME}"
     }
   }
 
