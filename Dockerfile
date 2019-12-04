@@ -24,6 +24,8 @@ RUN apt-get update -y && \
     psmisc \
     net-tools \
     htop \
+    telnet \
+    curl \
     vim \
 # gracyql specific
     gcc \
