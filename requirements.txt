@@ -2,7 +2,7 @@ python-dateutil
 starlette
 starlette-prometheus
 plac
-uvicorn==0.9.0
+uvicorn==0.11.7
 graphene
 #numpy==1.16.4
 spacy==2.1.9
